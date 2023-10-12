@@ -88,4 +88,17 @@ class Tasks extends ModelsDB
             echo "Error al ejecutar la consulta: " . $this->_db->error;
         }
     }
+
+    public function consultar_tareas($estado){
+        $instruccion = "CALL sp_get_tasksbystate('".$estado."')";
+        $consulta = $this->_db->query($instruccion);
+        $resultado = $consulta->fetch_all(MYSQLI_ASSOC);
+        if (!$resultado) {
+            return 400;
+        } else {
+            return $resultado;
+            $resultado->close();
+            $this->_db->close();
+        }
+    }
 }

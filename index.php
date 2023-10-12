@@ -18,7 +18,7 @@ include('./includes/header.php');
             <?php
             include('./Class/Tasks.php');
             $tasks = new Tasks();
-            $results = $tasks->consultar_noticias();
+            $results = $tasks->consultar_tareas('%');
             if ($results == 400) {
                 echo '<tr>';
                 echo '<td> No hay datos para mostrar</td>';

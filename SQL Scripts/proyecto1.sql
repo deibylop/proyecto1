@@ -128,3 +128,24 @@ DELIMITER ;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_tasksbystate`(
+  IN pstate VARCHAR(255)
+)
+
+BEGIN
+  SELECT
+    id,
+    title,
+    description,
+    state,
+    due_date,
+    edited,
+    responsible,
+    task_type
+  FROM
+    tasks
+    where state like pstate;
+END;
