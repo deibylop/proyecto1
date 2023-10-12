@@ -101,4 +101,18 @@ class Tasks extends ModelsDB
             $this->_db->close();
         }
     }
+    public function presentar_tarea($title,$desc,$id){
+        $html = '<tr>' .
+                    '<td>'.
+                        '<div class="card">' .
+                            '<div class="card-body">' .
+                                '<h5 class="card-title">' . $title . '</h5>' . 
+                                '<p class="card-text">' . $desc . '</p>' . 
+                            '</div>' .
+                        '</div>' .
+                    '</td>';
+
+                '</tr>';
+        return $html;
+    }
 }
