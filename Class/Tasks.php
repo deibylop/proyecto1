@@ -11,6 +11,34 @@ class Tasks extends ModelsDB
     protected $responsible;
     protected $task_type;
 
+    public function setTitle($nuevoValor)
+    {
+        $this->title = $nuevoValor;
+    }
+    public function setDescription($nuevoValor)
+    {
+        $this->description = $nuevoValor;
+    }
+    public function setState($nuevoValor)
+    {
+        $this->state = $nuevoValor;
+    }
+    public function setDueDate($nuevoValor)
+    {
+        $this->due_date = $nuevoValor;
+    }
+    public function setEdited($nuevoValor)
+    {
+        $this->edited = $nuevoValor;
+    }
+    public function setResponsible($nuevoValor)
+    {
+        $this->responsible = $nuevoValor;
+    }
+    public function setTaskType($nuevoValor)
+    {
+        $this->task_type = $nuevoValor;
+    }
 
     public function __construct()
     {
@@ -35,10 +63,39 @@ class Tasks extends ModelsDB
     public function guardar_tarea()
     {
 
-        $instruccion = 'CALL sp_insert_tasks()';
         //Datos
-        $consulta = $this->_db->query($instruccion);
-        $resultado = $consulta->fetch_all(MYSQLI_ASSOC);
+        $title = $this->title;
+        $description = $this->description;
+        $responsible = $this->responsible;
+        $state = $this->state ? $this->state : 'por hacer';
+        $due_date = $this->due_date;
+        $edited = $this->edited ? $this->edited : '0';
+        $task_type = $this->task_type;
+
+        $instruccion = "CALL sp_insert_tasks(
+            '$title',
+            '$description',
+            '$state',
+            '$due_date',
+            '$edited',
+            '$responsible',
+            '$task_type'
+        )";
+
+        echo $instruccion;
+
+        //$consulta = $this->_db->query($instruccion);
+
+        if ($this->_db->query($instruccion) === TRUE) {
+            echo "La consulta se ejecutó con éxito.";
+        } else {
+            echo "Error al ejecutar la consulta: " . $this->_db->error;
+        }
+
+        //$this->_db->execute($instruccion);
+
+        //$resultado = $consulta->fetch_all(MYSQLI_ASSOC);
+        /*
         if (!$resultado) {
             return 400;
         } else {
@@ -46,5 +103,6 @@ class Tasks extends ModelsDB
             $resultado->close();
             $this->_db->close();
         }
+        */
     }
 }
