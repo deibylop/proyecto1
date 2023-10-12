@@ -82,27 +82,10 @@ class Tasks extends ModelsDB
             '$task_type'
         )";
 
-        echo $instruccion;
-
-        //$consulta = $this->_db->query($instruccion);
-
         if ($this->_db->query($instruccion) === TRUE) {
-            echo "La consulta se ejecutó con éxito.";
+            //echo "La consulta se ejecutó con éxito.";
         } else {
             echo "Error al ejecutar la consulta: " . $this->_db->error;
         }
-
-        //$this->_db->execute($instruccion);
-
-        //$resultado = $consulta->fetch_all(MYSQLI_ASSOC);
-        /*
-        if (!$resultado) {
-            return 400;
-        } else {
-            return $resultado;
-            $resultado->close();
-            $this->_db->close();
-        }
-        */
     }
 }
