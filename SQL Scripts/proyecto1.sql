@@ -17,15 +17,6 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-
-
-
-
-
-
-
-
-
 CREATE TABLE `tasks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(120) NOT NULL,
@@ -43,6 +34,8 @@ INSERT INTO `tasks` (`id`, `title`, `description`, `state`, `due_date`, `edited`
 (4, 'Comprar leche', 'Comprar leche en el supermercado', 'por hacer', '2023-10-10 10:00:00', 0, 'Juan Pérez', 'Compras'),
 (5, 'Llamar al doctor', 'Llamar al doctor para programar una cita', 'por hacer', '2023-10-11 12:00:00', 0, 'María López', 'Salud');
 
+DELIMITER //
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_delete_task`(
   IN id INT
 )
@@ -51,6 +44,8 @@ BEGIN
   WHERE
     id = id;
 END;
+//
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_tasks`()
 BEGIN
   SELECT
@@ -65,6 +60,8 @@ BEGIN
   FROM
     tasks;
 END;
+//
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_insert_tasks`(
   IN title VARCHAR(255),
   IN description VARCHAR(255),
@@ -94,6 +91,8 @@ BEGIN
     task_type
   );
 END;
+//
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_update_task`(
   IN id INT,
   IN title VARCHAR(255),
@@ -117,6 +116,9 @@ BEGIN
   WHERE
     id = id;
 END;
+//
+
+DELIMITER ;
 
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

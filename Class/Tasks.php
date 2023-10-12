@@ -22,12 +22,29 @@ class Tasks extends ModelsDB
         $instruccion = 'CALL sp_get_tasks()';
         $consulta = $this->_db->query($instruccion);
         $resultado = $consulta->fetch_all(MYSQLI_ASSOC);
-            if (!$resultado) {
-                return 400;
-            } else {
-                return $resultado;
-                $resultado->close();
-                $this->_db->close();
-            }
+        if (!$resultado) {
+            return 400;
+        } else {
+            return $resultado;
+            $resultado->close();
+            $this->_db->close();
         }
     }
+
+
+    public function guardar_tarea()
+    {
+
+        $instruccion = 'CALL sp_insert_tasks()';
+        //Datos
+        $consulta = $this->_db->query($instruccion);
+        $resultado = $consulta->fetch_all(MYSQLI_ASSOC);
+        if (!$resultado) {
+            return 400;
+        } else {
+            return $resultado;
+            $resultado->close();
+            $this->_db->close();
+        }
+    }
+}

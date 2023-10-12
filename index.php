@@ -40,10 +40,18 @@ include('./includes/header.php');
             }
 
             ?>
+            <tr>
+                <td colspan="5">
+                    <a id="myInput" href="crear.php" class="btn btn-success pull-right">
+                        <i class="bi bi-plus"></i> Nueva
+                    </a>
+                </td>
+            </tr>
         </tbody>
     </table>
 </div>
-
+<script>
+</script>
 <?php
 include('./includes/footer.php');
 ?>
