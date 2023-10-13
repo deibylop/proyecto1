@@ -2,7 +2,7 @@
 include('./includes/header.php');
 ?>
 <br><br>
-<div class="container">
+<div class="container" style="max-width: max-content;">
     <div class="container text-center">
         <div class="card" style="width: 25rem;">
 

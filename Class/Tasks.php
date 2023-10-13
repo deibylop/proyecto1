@@ -101,18 +101,21 @@ class Tasks extends ModelsDB
             $this->_db->close();
         }
     }
-    public function presentar_tarea($title,$desc,$id){
+    public function presentar_tarea($title, $desc, $dueDate, $state, $id) {
+        $formattedDueDate = date('j/n/Y', strtotime($dueDate));
+
         $html = '<tr>' .
-                    '<td>'.
+                    '<td>' .
                         '<div class="card">' .
                             '<div class="card-body">' .
-                                '<h5 class="card-title">' . $title . '</h5>' . 
-                                '<p class="card-text">' . $desc . '</p>' . 
+                                '<h5 class="card-title">' . $title . '</h5>' .
+                                '<p class="card-text">' . $desc . '</p>' .
+                                '<p class="card-text">Fecha de Vencimiento: ' . $formattedDueDate . '</p>' . 
+                                '<p class="card-text">Estado: ' . $state . '</p>' . 
                             '</div>' .
                         '</div>' .
-                    '</td>';
-
+                    '</td>' .
                 '</tr>';
         return $html;
-    }
+    }    
 }
