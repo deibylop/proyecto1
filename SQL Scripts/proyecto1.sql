@@ -149,3 +149,33 @@ BEGIN
     tasks
     where state like pstate;
 END;
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_tasksbyfilters`(
+  IN pstate VARCHAR(255),
+  IN ptask_type VARCHAR(255),
+  IN pdate1 VARCHAR(15),
+  IN pdate2 VARCHAR(15)
+)
+
+BEGIN
+  SET pstate = IFNULL(pstate, '%');
+  SET ptask_type = IFNULL(ptask_type, '%');
+  SET pdate1 = IFNULL(pdate1, '1900-01-01');
+  SET pdate2 = IFNULL(pdate2, DATE_FORMAT(SYSDATE(), '%Y-%m-%d'));
+  SELECT
+    id,
+    title,
+    description,
+    state,
+    due_date,
+    edited,
+    responsible,
+    task_type
+  FROM
+    tasks
+    where state like pstate
+    and   task_type like ptask_type
+    and   DATE(due_date) >= DATE(pdate1)
+    and   DATE(due_date) <= DATE(pdate2);
+END;

@@ -89,33 +89,46 @@ class Tasks extends ModelsDB
         }
     }
 
-    public function consultar_tareas($estado){
-        $instruccion = "CALL sp_get_tasksbystate('".$estado."')";
+    public function tasks_query($state,$task_type,$due_date1,$due_date2){
+        if($task_type=="null" or $task_type == '' or $task_type == null){
+            $task_type='null';
+        }else{
+            $task_type = "'".$task_type."'";
+        }
+        if($due_date1=="null" or $due_date1 == '' or $due_date1 == null){
+            $due_date1='null';
+        }else{
+            $due_date1 = "'".$due_date1."'";
+        }
+        if($due_date2=="null" or $due_date2 == '' or $due_date2 == null){
+            $due_date2='null';
+        }else{
+            $due_date2 = "'".$due_date2."'";
+        }
+        $instruccion = "CALL sp_get_tasksbyfilters('".$state."',".$task_type.",".$due_date1.",".$due_date2.")";
         $consulta = $this->_db->query($instruccion);
         $resultado = $consulta->fetch_all(MYSQLI_ASSOC);
+        $html = '';
         if (!$resultado) {
-            return 400;
+            return "<tr><td> No hay datos para mostrar</td></tr>";
         } else {
-            return $resultado;
+            foreach ($resultado as $row) {
+                $html = $html . '<tr>' .
+                                    '<td>' .
+                                        '<div class="card">' .
+                                            '<div class="card-body">' .
+                                                '<h5 class="card-title">' . $row["title"] . '</h5>' .
+                                                '<p class="card-text">' . $row["description"] . '</p>' .
+                                                '<p class="card-text">Fecha de Vencimiento: ' . date('j/n/Y', strtotime($row['due_date'])) . '</p>' . 
+                                                '<p class="card-text">Estado: ' . $row['state'] . '</p>' . 
+                                            '</div>' .
+                                        '</div>' .
+                                    '</td>' .
+                                '</tr>';
+            }
+            return $html;
             $resultado->close();
             $this->_db->close();
         }
-    }
-    public function presentar_tarea($title, $desc, $dueDate, $state, $id) {
-        $formattedDueDate = date('j/n/Y', strtotime($dueDate));
-
-        $html = '<tr>' .
-                    '<td>' .
-                        '<div class="card">' .
-                            '<div class="card-body">' .
-                                '<h5 class="card-title">' . $title . '</h5>' .
-                                '<p class="card-text">' . $desc . '</p>' .
-                                '<p class="card-text">Fecha de Vencimiento: ' . $formattedDueDate . '</p>' . 
-                                '<p class="card-text">Estado: ' . $state . '</p>' . 
-                            '</div>' .
-                        '</div>' .
-                    '</td>' .
-                '</tr>';
-        return $html;
-    }    
+    }  
 }
