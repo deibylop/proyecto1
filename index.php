@@ -19,6 +19,7 @@
                         </div>
                         <h5 class="mt-4">Filtros</h5>
                         <select name="state" id="" class="form-control">
+                            <option value="" <?php if(!isset($_POST['state'])){echo "selected";}?>>Estatus...</option>
                             <option value="por hacer" <?php if(isset($_POST['state']) and $_POST['state']=="por hacer"){echo "selected";}?>>Por Hacer</option>
                             <option value="en progreso" <?php if(isset($_POST['state']) and $_POST['state']=="en progreso"){echo "selected";}?>>En Progreso</option>
                             <option value="completado" <?php if(isset($_POST['state']) and $_POST['state']=="completado"){echo "selected";}?>>Completado</option>
