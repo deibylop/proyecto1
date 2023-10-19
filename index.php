@@ -8,15 +8,22 @@
         <div class="col-2">
             <div class="offcanvas offcanvas-start show text-bg-dark" tabindex="-1" id="offcanvasDark" aria-labelledby="offcanvasDarkLabel" style="--bs-offcanvas-width: 15% !important;">
                 <div class="offcanvas-header">
-                    <h5 class="offcanvas-title" id="offcanvasDarkLabel">Offcanvas</h5>
+                    <h5 class="offcanvas-title" id="offcanvasDarkLabel">To-Do-List</h5>
                 </div>
                 <div class="offcanvas-body">
-                    <form action="index.php" method="post">
-                        <div class="d-grid gap-2">
-                            <a id="myInput" href="crear.php" class="btn btn-success lg">
-                                <i class="bi bi-plus"></i> Nueva Tarea
-                            </a>
-                        </div>
+                    <div class="d-grid gap-2">
+                        <a id="myInput" href="crear.php" class="btn btn-secondary lg">
+                            <i class="bi bi-plus"></i> Nueva Tarea
+                        </a>
+                    </div>
+                    <div class="d-grid gap-2 mt-2">
+                        <a id="myInput" href="consulta.php" class="btn btn-secondary lg">
+                            <i class="bi bi-table me-1"></i> Reportes
+                        </a>
+                    </div>
+                    
+                    <!--form action="index.php" method="post">
+
                         <h5 class="mt-4">Filtros</h5>
                         <select name="state" id="" class="form-control">
                             <option value="" <?php if(!isset($_POST['state'])){echo "selected";}?>>Estatus...</option>
@@ -35,7 +42,7 @@
                                 <i class="bi bi-search me-1"></i>Buscar
                             </button>
                         </div>
-                    </form>
+                    </form-->
                 </div>
             </div>
         </div>
@@ -51,16 +58,7 @@
                             <tbody>
                                 <?php
                                 $tasks = new Tasks();
-                                $constantstate = "por hacer";
-                                if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                                    $results = $tasks->tasks_query($constantstate,null,null,null);
-                                }elseif($_SERVER['REQUEST_METHOD'] === 'POST'){
-                                    $state = "0";
-                                    if($_POST['state']==$constantstate or $_POST['state']==''){
-                                        $state = $constantstate;
-                                    }
-                                    $results = $tasks->tasks_query($state,$_POST['task_type'],$_POST['due_date1'],$_POST['due_date2']);
-                                } 
+                                $results = $tasks->consultar_tareas("por hacer");
                                 echo $results;
                                 ?>
                             </tbody>
@@ -78,16 +76,7 @@
                             <tbody>
                             <?php
                                 $tasks = new Tasks();
-                                $constantstate = "en progreso";
-                                if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                                    $results = $tasks->tasks_query($constantstate,null,null,null);
-                                }elseif($_SERVER['REQUEST_METHOD'] === 'POST'){
-                                    $state = "0";
-                                    if($_POST['state']==$constantstate or $_POST['state']==''){
-                                        $state = $constantstate;
-                                    }
-                                    $results = $tasks->tasks_query($state,$_POST['task_type'],$_POST['due_date1'],$_POST['due_date2']);
-                                } 
+                                $results = $tasks->consultar_tareas("en progreso");
                                 echo $results;
                                 ?>
                             </tbody>
@@ -105,16 +94,7 @@
                             <tbody>
                                 <?php
                                     $tasks = new Tasks();
-                                    $constantstate = "completada";
-                                    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                                        $results = $tasks->tasks_query($constantstate,null,null,null);
-                                    }elseif($_SERVER['REQUEST_METHOD'] === 'POST'){
-                                        $state = "0";
-                                        if($_POST['state']==$constantstate or $_POST['state']==''){
-                                            $state = $constantstate;
-                                        }
-                                        $results = $tasks->tasks_query($state,$_POST['task_type'],$_POST['due_date1'],$_POST['due_date2']);
-                                    } 
+                                    $results = $tasks->consultar_tareas("completada");
                                     echo $results;
                                 ?>
                             </tbody>

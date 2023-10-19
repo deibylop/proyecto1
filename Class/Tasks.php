@@ -45,15 +45,34 @@ class Tasks extends ModelsDB
         parent::__construct();
     }
 
-    public function consultar_noticias()
+    public function consultar_tareas($state)
     {
-        $instruccion = 'CALL sp_get_tasks()';
+        $instruccion = "CALL sp_get_tasksbystate('".$state."')";
         $consulta = $this->_db->query($instruccion);
         $resultado = $consulta->fetch_all(MYSQLI_ASSOC);
+        $html = '';
         if (!$resultado) {
-            return 400;
+            return "<tr><td> No hay datos para mostrar</td></tr>";
         } else {
-            return $resultado;
+            foreach ($resultado as $row) {
+                $html = $html . '<tr>' .
+                                    '<td>' .
+                                        '<div class="card">' .
+                                            '<div class="card-body">' .
+                                                '<h5 class="card-title">' . $row["title"] . '</h5>' .
+                                                '<p class="card-text">' . $row["description"] . '</p>' .
+                                                '<p class="card-text">'. 
+                                                    'Fecha de Vencimiento: ' . date('j/n/Y', strtotime($row['due_date'])) . '<br>' . 
+                                                    'Tipo: '.$row["icon"].' '.$row["tipo"].'  -  '.
+                                                    '<a href=editar.php?id='.$row["id"].'><i class="bi bi-pencil"></i> Editar</a>'.
+                                                '</p>' . 
+                                                
+                                            '</div>' .
+                                        '</div>' .
+                                    '</td>' .
+                                '</tr>';
+            }
+            return $html;
             $resultado->close();
             $this->_db->close();
         }
@@ -131,4 +150,68 @@ class Tasks extends ModelsDB
             $this->_db->close();
         }
     }  
+
+    
+    public function lista_tipos()
+    {
+        $instruccion = 'CALL sp_get_tasktype()';
+        $consulta = $this->_db->query($instruccion);
+        $resultado = $consulta->fetch_all(MYSQLI_ASSOC);
+        if (!$resultado) {
+            return 400;
+        } else {
+            $html = '<option value="" disabled selected>Tipo...</option>';
+            foreach ($resultado as $row) {
+                $html = $html . '<option value="'.$row["id"].'">'.$row["title"].'</option>';
+            }
+            return $html;
+            $resultado->close();
+            $this->_db->close();
+        }
+    }
+
+    public function consultar_tareasporid($id)
+    {
+        $instruccion = "CALL sp_get_tasksbyid('".$id."')";
+        $consulta = $this->_db->query($instruccion);
+        $resultado = $consulta->fetch_all(MYSQLI_ASSOC);
+        $html = '';
+        if (!$resultado) {
+            return "<tr><td> No hay datos para mostrar</td></tr>";
+        } else {
+            return $resultado;
+            $resultado->close();
+            $this->_db->close();
+        }
+    }
+
+    public function actualizar_tarea($id)
+    {
+
+        //Datos
+        $title = $this->title;
+        $description = $this->description;
+        $responsible = $this->responsible;
+        $state = $this->state ? $this->state : 'por hacer';
+        $due_date = $this->due_date;
+        $edited = $this->edited ? $this->edited : '0';
+        $task_type = $this->task_type;
+
+        $instruccion = "CALL sp_update_task(
+            '$id',
+            '$title',
+            '$description',
+            '$state',
+            '$due_date',
+            '$edited',
+            '$responsible',
+            '$task_type'
+        )";
+
+        if ($this->_db->query($instruccion) === TRUE) {
+            //echo "La consulta se ejecutó con éxito.";
+        } else {
+            echo "Error al ejecutar la consulta: " . $this->_db->error;
+        }
+    }
 }

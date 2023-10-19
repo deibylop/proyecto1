@@ -46,21 +46,6 @@ BEGIN
 END;
 //
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_tasks`()
-BEGIN
-  SELECT
-    id,
-    title,
-    description,
-    state,
-    due_date,
-    edited,
-    responsible,
-    task_type
-  FROM
-    tasks;
-END;
-//
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_insert_tasks`(
   IN title VARCHAR(255),
@@ -94,27 +79,27 @@ END;
 //
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_update_task`(
-  IN id INT,
-  IN title VARCHAR(255),
-  IN description VARCHAR(255),
-  IN state VARCHAR(255),
-  IN due_date DATETIME,
-  IN edited TINYINT(1),
-  IN responsible VARCHAR(255),
-  IN task_type VARCHAR(255)
+  IN pid INT,
+  IN ptitle VARCHAR(255),
+  IN pdescription VARCHAR(255),
+  IN pstate VARCHAR(255),
+  IN pdue_date DATETIME,
+  IN pedited TINYINT(1),
+  IN presponsible VARCHAR(255),
+  IN ptask_type VARCHAR(255)
 )
 BEGIN
   UPDATE tasks
   SET
-    title = title,
-    description = description,
-    state = state,
-    due_date = due_date,
-    edited = edited,
-    responsible = responsible,
-    task_type = task_type
+    title = ptitle,
+    description = pdescription,
+    state = pstate,
+    due_date = pdue_date,
+    edited = pedited,
+    responsible = presponsible,
+    task_type = ptask_type
   WHERE
-    id = id;
+    id = pid;
 END;
 //
 
@@ -137,17 +122,20 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_tasksbystate`(
 
 BEGIN
   SELECT
-    id,
-    title,
-    description,
-    state,
-    due_date,
-    edited,
-    responsible,
-    task_type
-  FROM
-    tasks
-    where state like pstate;
+    t.id,
+    t.title,
+    t.description,
+    t.state,
+    t.due_date,
+    t.edited,
+    t.responsible,
+    tt.id task_type,
+    tt.icon,
+    tt.title tipo
+  FROM tasks t
+  LEFT JOIN task_type tt
+  on t.task_type = tt.id
+  where t.state like pstate;
 END;
 
 
@@ -179,3 +167,52 @@ BEGIN
     and   DATE(due_date) >= DATE(pdate1)
     and   DATE(due_date) <= DATE(pdate2);
 END;
+
+CREATE TABLE `task_type` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(120) NOT NULL,
+  `icon` varchar(50),
+  PRIMARY KEY (`id`)
+);
+
+insert into task_type(title,icon)values('Personal','<i class="bi bi-person-badge-fill"></i>');
+insert into task_type(title,icon)values('Trabajo','<i class="bi bi-briefcase-fill"></i>');
+insert into task_type(title,icon)values('Compras','<i class="bi bi-cart4"></i>');
+insert into task_type(title,icon)values('Salud','<i class="bi bi-clipboard2-pulse"></i>');
+insert into task_type(title,icon)values('Programación','<i class="bi bi-code-slash"></i>');
+insert into task_type(title,icon)values('Educación','<i class="bi bi-book"></i>');
+insert into task_type(title,icon)values('Finanzas','<i class="bi bi-piggy-bank"></i>');
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_tasktype`()
+
+BEGIN
+  SELECT
+    id,
+    title,
+    icon
+  FROM
+    task_type;
+END;
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_tasksbyid`(
+    IN pid INT
+)
+BEGIN
+  SELECT
+    t.id,
+    t.title,
+    t.description,
+    t.state,
+    t.due_date,
+    t.edited,
+    t.responsible,
+    tt.id task_type,
+    tt.icon,
+    tt.title tipo
+  FROM tasks t
+  LEFT JOIN task_type tt
+  on t.task_type = tt.id
+  where t.id like pid;
+END;
+//

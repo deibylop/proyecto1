@@ -17,50 +17,60 @@ include('./Class/Tasks.php');
                 $task->setResponsible($_POST['responsible']);
                 $task->setDueDate($_POST['due_date']);
                 $task->setTaskType($_POST['task_type']);
-                $task->guardar_tarea();
-
+                $task->actualizar_tarea($_POST['id']);
+                header('LOCATION:index.php'); die();
                 ?>
                 <a href="index.php" class="btn btn-primary"><i></i>Regresar</a>
                 <?php
             } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $tasks = new Tasks();
+                $results = $tasks->consultar_tareasporid($_GET['id']);
+                foreach ($results as $row) {
+                    $title = $row['title'];
+                    $description = $row['description'];
+                    $responsible = $row['responsible'];
+                    $due_date = date('Y-n-j', strtotime($row['due_date']));
+                    $task_type = $row['task_type'];
+                }
                 ?>
-                <form action="crear.php" method="post" class="was-validated" >
+                <form action="editar.php" method="post" class="was-validated" >
+                    <input name="id" type="hidden" value="<?php if(isset($_GET['id'])){echo $_GET['id'];} ?>">
                     <div class="card-body">
                         <h5 class="card-title">Nueva Tarea</h5>
                         <p class="card-text"></p>
                     </div>
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item">
-                            <input name="title" type="text" class="form-control" placeholder="Título" aria-label="Título" required>
+                            <input name="title" type="text" class="form-control" placeholder="Título" aria-label="Título" value="<?php if(isset($title)){echo $title;} ?>" required>
                         </li>
                         <li class="list-group-item">
                             <input name="description" type="text" class="form-control" placeholder="Descripción" 
-                                aria-label="Descripción" required>
+                                aria-label="Descripción" value="<?php if(isset($description)){echo $description;} ?>" required>
                         </li>
                         <li class="list-group-item">
                             <input name="responsible" type="text" class="form-control" placeholder="Responsable"
-                                aria-label="Responsable" required>
+                                aria-label="Responsable" value="<?php if(isset($responsible)){echo $responsible;} ?>" required>
                         </li>
                         <li class="list-group-item">
-                            <input name="due_date" type="date" class="form-control" placeholder="Fecha" aria-label="Fecha" required>
+                            <input name="due_date" type="date" class="form-control" placeholder="Fecha" aria-label="Fecha" value="<?php if(isset($due_date)){echo $due_date;} ?>" required>
                         </li>
                         <li class="list-group-item">
                             <select name="task_type" class="form-control" aria-label="Tipo" required>
                                 <?php
                                 $tasks = new Tasks();
                                 $options = $tasks->lista_tipos();
+                                if($options){
+                                    $options = str_replace('value="'.$task_type.'"','value="'.$task_type.'" selected ',$options);
+                                }
                                 echo $options;
                                 ?>
                             </select>
-                            <!--input name="task_type" type="text" class="form-control" placeholder="Tipo" aria-label="Tipo"-->
                         </li>
                     </ul>
-                    <div class="card-body">
-                        <a id="myInput" href="index.php" class="btn btn-secondary lg">
+                    <a id="myInput" href="index.php" class="btn btn-secondary lg">
                             <i class="bi bi-arrow-left"></i> Retornar
                         </a>
                         <button type="submit" class="btn btn-primary">Guardar</button>
-                    </div>
                 </form>
                 <?php
             } else {
