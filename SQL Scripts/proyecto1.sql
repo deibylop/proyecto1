@@ -46,7 +46,6 @@ BEGIN
 END;
 //
 
-
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_insert_tasks`(
   IN title VARCHAR(255),
   IN description VARCHAR(255),
@@ -115,7 +114,6 @@ DELIMITER ;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 
-
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_tasksbystate`(
   IN pstate VARCHAR(255)
 )
@@ -138,7 +136,7 @@ BEGIN
   where t.state like pstate;
 END;
 
-
+/*
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_tasksbyfilters`(
   IN pstate VARCHAR(255),
   IN ptask_type VARCHAR(255),
@@ -174,6 +172,7 @@ CREATE TABLE `task_type` (
   `icon` varchar(50),
   PRIMARY KEY (`id`)
 );
+*/
 
 insert into task_type(title,icon)values('Personal','<i class="bi bi-person-badge-fill"></i>');
 insert into task_type(title,icon)values('Trabajo','<i class="bi bi-briefcase-fill"></i>');
@@ -214,5 +213,98 @@ BEGIN
   LEFT JOIN task_type tt
   on t.task_type = tt.id
   where t.id like pid;
+END;
+//
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_tasksbygroup`(
+  IN mode  VARCHAR(1),
+  IN pgroup VARCHAR(15)
+)
+BEGIN
+  IF mode = 'D' THEN
+    SELECT
+      t.state group_order,
+      t.state group_column,
+      t.id,
+      t.title,
+      t.state,
+      DATE_FORMAT(t.due_date, '%d-%m-%Y')due_date,
+      tt.title tipo
+    FROM tasks t
+    LEFT JOIN task_type tt
+    on t.task_type = tt.id
+    where pgroup = 'state'
+    union
+      SELECT
+      tt.title group_order,
+      tt.title group_column,
+      t.id,
+      t.title,
+      t.state,
+      DATE_FORMAT(t.due_date, '%d-%m-%Y')due_date,
+      tt.title tipo
+    FROM tasks t
+    INNER JOIN task_type tt
+    on t.task_type = tt.id
+    where pgroup = 'task_type'
+    union
+      SELECT
+      t.due_date group_order,
+      DATE_FORMAT(t.due_date, '%d-%m-%Y') group_column,
+      t.id,
+      t.title,
+      t.state,
+      DATE_FORMAT(t.due_date, '%d-%m-%Y')due_date,
+      tt.title tipo
+    FROM tasks t
+    LEFT JOIN task_type tt
+    on t.task_type = tt.id
+    where pgroup = 'due_date_date'
+    union
+    SELECT
+      DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY)group_order,
+      DATE_FORMAT(DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY), '%d-%m-%Y')  group_column,
+      t.id,
+      t.title,
+      t.state,
+      DATE_FORMAT(t.due_date, '%d-%m-%Y')due_date,
+      tt.title tipo
+    FROM tasks t
+    LEFT JOIN task_type tt
+    on t.task_type = tt.id
+    where pgroup = 'due_date_week'
+    order by 1;
+  elseif mode = 'G' then
+    SELECT
+      t.state group_column,
+      count(*)total
+    FROM tasks t
+    where pgroup = 'state'
+    group by t.state
+    union
+      SELECT
+      tt.title group_column,
+      count(*)total
+    FROM tasks t
+    INNER JOIN task_type tt
+    on t.task_type = tt.id
+    where pgroup = 'task_type'
+    group by tt.title
+    union
+      SELECT
+      DATE_FORMAT(t.due_date, '%d-%m-%Y') group_column,
+      count(*)total
+    FROM tasks t
+    where pgroup = 'due_date_date'
+    group by DATE_FORMAT(t.due_date, '%d-%m-%Y')
+    union
+    SELECT
+      DATE_FORMAT(DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY), '%d-%m-%Y')  group_column,
+      count(*)total
+    FROM tasks t
+    where pgroup = 'due_date_week'
+    group by DATE_FORMAT(DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY), '%d-%m-%Y');
+  END IF;
+  
 END;
 //

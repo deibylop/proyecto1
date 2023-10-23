@@ -108,43 +108,46 @@ class Tasks extends ModelsDB
         }
     }
 
-    public function tasks_query($state,$task_type,$due_date1,$due_date2){
-        if($task_type=="null" or $task_type == '' or $task_type == null){
-            $task_type='null';
-        }else{
-            $task_type = "'".$task_type."'";
-        }
-        if($due_date1=="null" or $due_date1 == '' or $due_date1 == null){
-            $due_date1='null';
-        }else{
-            $due_date1 = "'".$due_date1."'";
-        }
-        if($due_date2=="null" or $due_date2 == '' or $due_date2 == null){
-            $due_date2='null';
-        }else{
-            $due_date2 = "'".$due_date2."'";
-        }
-        $instruccion = "CALL sp_get_tasksbyfilters('".$state."',".$task_type.",".$due_date1.",".$due_date2.")";
+    public function consultar_tareas_x_grupo($mode,$group){
+        $instruccion = "CALL sp_get_tasksbygroup('".$mode."','".$group."')";
         $consulta = $this->_db->query($instruccion);
         $resultado = $consulta->fetch_all(MYSQLI_ASSOC);
         $html = '';
         if (!$resultado) {
             return "<tr><td> No hay datos para mostrar</td></tr>";
         } else {
-            foreach ($resultado as $row) {
-                $html = $html . '<tr>' .
-                                    '<td>' .
-                                        '<div class="card">' .
-                                            '<div class="card-body">' .
-                                                '<h5 class="card-title">' . $row["title"] . '</h5>' .
-                                                '<p class="card-text">' . $row["description"] . '</p>' .
-                                                '<p class="card-text">Fecha de Vencimiento: ' . date('j/n/Y', strtotime($row['due_date'])) . '</p>' . 
-                                                '<p class="card-text">Estado: ' . $row['state'] . '</p>' . 
-                                            '</div>' .
-                                        '</div>' .
-                                    '</td>' .
-                                '</tr>';
+            //detallado
+            if($mode=='D'){
+                if($group=="state"){
+                    $encabezado = "Estado";
+                }elseif($group=="task_type"){
+                    $encabezado = "Tipo";
+                }elseif($group=="due_date_date"){
+                    $encabezado = "Día";
+                }elseif($group=="due_date_week"){
+                    $encabezado = "Semana";
+                }
+                $html = "<tr><th>".$encabezado."</th><th>Titulo</th><th>Estado</th><th>Fecha</th><th>Tipo</th></tr>";
+                foreach ($resultado as $row) {
+                    $html = $html . '<tr>' .
+                                        '<td><b>' . $row["group_column"] . '</b></td>'.
+                                        '<td><a href=editar.php?id='.$row["id"].'><i class="bi bi-pencil"></i></a>  ' . $row["title"] . '</td>' .
+                                        '<td>' . $row["state"] . '</td>'.
+                                        '<td>' . $row["due_date"] . '</td>' .
+                                        '<td>' . $row["tipo"]. '</td>'.
+                                    '</tr>';
+                }
+            }else{
+                //agrupado
+                $html = "<tr><th>Descripción</th><th>Cantidad</th></tr>";
+                foreach ($resultado as $row) {
+                    $html = $html . '<tr>' .
+                                        '<td>' . $row["group_column"] . '</td>' .
+                                        '<td>' . $row["total"] . '</td>'.
+                                    '</tr>';
+                }
             }
+
             return $html;
             $resultado->close();
             $this->_db->close();
