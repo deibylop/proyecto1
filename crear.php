@@ -9,8 +9,6 @@ include('./Class/Tasks.php');
 
             <?php
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-                
                 $task = new Tasks();
                 $task->setTitle($_POST['title']);
                 $task->setDescription($_POST['description']);
@@ -18,9 +16,8 @@ include('./Class/Tasks.php');
                 $task->setDueDate($_POST['due_date']);
                 $task->setTaskType($_POST['task_type']);
                 $task->guardar_tarea();
-
+                header('Location: index.php'); die();
                 ?>
-                <a href="index.php" class="btn btn-primary"><i></i>Regresar</a>
                 <?php
             } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 ?>
@@ -52,7 +49,6 @@ include('./Class/Tasks.php');
                                 echo $options;
                                 ?>
                             </select>
-                            <!--input name="task_type" type="text" class="form-control" placeholder="Tipo" aria-label="Tipo"-->
                         </li>
                     </ul>
                     <div class="card-body">

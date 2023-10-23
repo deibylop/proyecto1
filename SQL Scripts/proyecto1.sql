@@ -21,7 +21,7 @@ CREATE TABLE `tasks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(120) NOT NULL,
   `description` varchar(255) NOT NULL,
-  `state` varchar(10) NOT NULL,
+  `state` varchar(15) NOT NULL,
   `due_date` datetime NOT NULL,
   `edited` tinyint(1) NOT NULL DEFAULT '0',
   `responsible` varchar(100) NOT NULL,
@@ -37,12 +37,12 @@ INSERT INTO `tasks` (`id`, `title`, `description`, `state`, `due_date`, `edited`
 DELIMITER //
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_delete_task`(
-  IN id INT
+  IN pid INT
 )
 BEGIN
   DELETE FROM tasks
   WHERE
-    id = id;
+    id = pid;
 END;
 //
 
@@ -136,44 +136,6 @@ BEGIN
   where t.state like pstate;
 END;
 
-/*
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_tasksbyfilters`(
-  IN pstate VARCHAR(255),
-  IN ptask_type VARCHAR(255),
-  IN pdate1 VARCHAR(15),
-  IN pdate2 VARCHAR(15)
-)
-
-BEGIN
-  SET pstate = IFNULL(pstate, '%');
-  SET ptask_type = IFNULL(ptask_type, '%');
-  SET pdate1 = IFNULL(pdate1, '1900-01-01');
-  SET pdate2 = IFNULL(pdate2, DATE_FORMAT(SYSDATE(), '%Y-%m-%d'));
-  SELECT
-    id,
-    title,
-    description,
-    state,
-    due_date,
-    edited,
-    responsible,
-    task_type
-  FROM
-    tasks
-    where state like pstate
-    and   task_type like ptask_type
-    and   DATE(due_date) >= DATE(pdate1)
-    and   DATE(due_date) <= DATE(pdate2);
-END;
-
-CREATE TABLE `task_type` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(120) NOT NULL,
-  `icon` varchar(50),
-  PRIMARY KEY (`id`)
-);
-*/
-
 insert into task_type(title,icon)values('Personal','<i class="bi bi-person-badge-fill"></i>');
 insert into task_type(title,icon)values('Trabajo','<i class="bi bi-briefcase-fill"></i>');
 insert into task_type(title,icon)values('Compras','<i class="bi bi-cart4"></i>');
@@ -225,6 +187,7 @@ BEGIN
     SELECT
       t.state group_order,
       t.state group_column,
+      case when (dense_rank() over (partition by t.state order by t.state,t.due_date,t.id)) = 1 then COUNT(t.state) OVER (PARTITION BY t.state) else 0 end  as group_total,
       t.id,
       t.title,
       t.state,
@@ -238,6 +201,7 @@ BEGIN
       SELECT
       tt.title group_order,
       tt.title group_column,
+      case when (dense_rank() over (partition by tt.title order by tt.title,t.due_date,t.id)) = 1 then COUNT(tt.title) OVER (PARTITION BY tt.title) else 0 end  as group_total,
       t.id,
       t.title,
       t.state,
@@ -251,6 +215,7 @@ BEGIN
       SELECT
       t.due_date group_order,
       DATE_FORMAT(t.due_date, '%d-%m-%Y') group_column,
+      case when (dense_rank() over (partition by t.due_date order by t.due_date,t.id)) = 1 then COUNT(t.due_date) OVER (PARTITION BY t.due_date) else 0 end  as group_total,
       t.id,
       t.title,
       t.state,
@@ -264,6 +229,7 @@ BEGIN
     SELECT
       DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY)group_order,
       DATE_FORMAT(DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY), '%d-%m-%Y')  group_column,
+      case when (dense_rank() over (partition by DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY) order by DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY),t.due_date,t.id)) = 1 then COUNT(DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY)) OVER (PARTITION BY DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY)) else 0 end  as group_total,
       t.id,
       t.title,
       t.state,
@@ -273,7 +239,34 @@ BEGIN
     LEFT JOIN task_type tt
     on t.task_type = tt.id
     where pgroup = 'due_date_week'
-    order by 1;
+    union
+      SELECT
+      DATE_FORMAT(t.due_date, '%Y-%m') group_order,
+      DATE_FORMAT(t.due_date, '%Y-%m') group_column,
+      case when (dense_rank() over (partition by DATE_FORMAT(t.due_date, '%Y-%m')order by DATE_FORMAT(t.due_date, '%Y-%m'),t.due_date,t.id)) = 1 then COUNT(DATE_FORMAT(t.due_date, '%Y-%m')) OVER (PARTITION BY DATE_FORMAT(t.due_date, '%Y-%m')) else 0 end  as group_total,
+      t.id,
+      t.title,
+      t.state,
+      DATE_FORMAT(t.due_date, '%d-%m-%Y')due_date,
+      tt.title tipo
+    FROM tasks t
+    LEFT JOIN task_type tt
+    on t.task_type = tt.id
+    where pgroup = 'due_date_month'
+    union
+      SELECT
+      DATE_FORMAT(t.due_date, '%Y') group_order,
+      DATE_FORMAT(t.due_date, '%Y') group_column,
+      case when (dense_rank() over (partition by DATE_FORMAT(t.due_date, '%Y')order by DATE_FORMAT(t.due_date, '%Y'),t.due_date,t.id)) = 1 then COUNT(DATE_FORMAT(t.due_date, '%Y')) OVER (PARTITION BY DATE_FORMAT(t.due_date, '%Y')) else 0 end  as group_total,
+      t.id,
+      t.title,
+      t.state,
+      DATE_FORMAT(t.due_date, '%d-%m-%Y')due_date,
+      tt.title tipo
+    FROM tasks t
+    LEFT JOIN task_type tt
+    on t.task_type = tt.id
+    where pgroup = 'due_date_year';
   elseif mode = 'G' then
     SELECT
       t.state group_column,
@@ -303,7 +296,21 @@ BEGIN
       count(*)total
     FROM tasks t
     where pgroup = 'due_date_week'
-    group by DATE_FORMAT(DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY), '%d-%m-%Y');
+    group by DATE_FORMAT(DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY), '%d-%m-%Y')
+    union
+      SELECT
+      DATE_FORMAT(t.due_date, '%Y-%m') group_column,
+      count(*)total
+    FROM tasks t
+    where pgroup = 'due_date_month'
+    group by DATE_FORMAT(t.due_date, '%Y-%m')
+    union
+      SELECT
+      DATE_FORMAT(t.due_date, '%Y') group_column,
+      count(*)total
+    FROM tasks t
+    where pgroup = 'due_date_year'
+    group by DATE_FORMAT(t.due_date, '%Y');
   END IF;
   
 END;

@@ -8,19 +8,21 @@ include('./Class/Tasks.php');
         <div class="card" style="width: 25rem;">
 
             <?php
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-                
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {                
                 $task = new Tasks();
                 $task->setTitle($_POST['title']);
                 $task->setDescription($_POST['description']);
                 $task->setResponsible($_POST['responsible']);
                 $task->setDueDate($_POST['due_date']);
                 $task->setTaskType($_POST['task_type']);
+                $task->setState($_POST['state']);
                 $task->actualizar_tarea($_POST['id']);
-                header('LOCATION:index.php'); die();
-                ?>
-                <a href="index.php" class="btn btn-primary"><i></i>Regresar</a>
+                if(isset($_POST['mode'])){
+                    header('Location: consulta.php?mode='.$_POST['mode'].'&group='.$_POST['group']); die();
+                }else{
+                    header('Location: index.php'); die();
+                }
+            ?>
                 <?php
             } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $tasks = new Tasks();
@@ -31,12 +33,21 @@ include('./Class/Tasks.php');
                     $responsible = $row['responsible'];
                     $due_date = date('Y-n-j', strtotime($row['due_date']));
                     $task_type = $row['task_type'];
+                    $state = $row['state'];
                 }
                 ?>
                 <form action="editar.php" method="post" class="was-validated" >
-                    <input name="id" type="hidden" value="<?php if(isset($_GET['id'])){echo $_GET['id'];} ?>">
+                    <input id="myid" name="id" type="hidden" value="<?php if(isset($_GET['id'])){echo $_GET['id'];} ?>">
                     <div class="card-body">
-                        <h5 class="card-title">Nueva Tarea</h5>
+                        <h5 class="card-title">
+                        <?php 
+                            if(isset($_REQUEST['id'])){
+                                echo "Editar Tarea (".$_REQUEST['id'].")";
+                            }else{
+                                echo "Nueva Tarea";
+                            }
+                        ?>    
+                        </h5>
                         <p class="card-text"></p>
                     </div>
                     <ul class="list-group list-group-flush">
@@ -66,11 +77,27 @@ include('./Class/Tasks.php');
                                 ?>
                             </select>
                         </li>
+                        <li class="list-group-item">
+                            <select name="state" class="form-control" aria-label="Estado" required>
+                                <option value="por hacer" <?php if(isset($state) and $state=="por hacer"){echo "selected";}?>>Por Hacer</option>
+                                <option value="en progreso" <?php if(isset($state) and $state=="en progreso"){echo "selected";}?>>En Progreso</option>
+                                <option value="completada" <?php if(isset($state) and $state=="completada"){echo "selected";}?>>Completada</option>
+                            </select>
+                        </li>
                     </ul>
-                    <a id="myInput" href="index.php" class="btn btn-secondary lg">
-                            <i class="bi bi-arrow-left"></i> Retornar
-                        </a>
-                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    <a id="myInput" <?php if(isset($_GET['mode'])){echo 'href="consulta.php?mode='.$_GET['mode'].'&group='.$_GET['group'].'"';}else{echo 'href="index.php"';}  ?> class="btn btn-secondary lg">
+                        <i class="bi bi-arrow-left"></i> Retornar
+                    </a>
+                    <button type="button" class="btn btn-danger" onclick='<?php echo (isset($_GET['mode'])?'myDelete("C")':'myDelete("I")'); ?>'><i class="bi bi-trash"></i> Delete</button>
+                    <?php
+                        if(isset($_GET['mode'])){
+                            echo '<input name="mode" type="hidden" value="'.$_GET['mode'].'">';
+                        }
+                        if(isset($_GET['group'])){
+                            echo '<input name="group" type="hidden" value="'.$_GET['group'].'">';
+                        }
+                    ?>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
                 </form>
                 <?php
             } else {

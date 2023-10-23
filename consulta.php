@@ -2,7 +2,7 @@
     include('./includes/header.php');
     include('./Class/Tasks.php');
 ?>
-<div class="container-full">
+<div class="container-full" id="consulta">
     
     <div class="row m-0">
         <div class="col-2">
@@ -18,22 +18,24 @@
                             </a>
                         </div>
                         <h5 class="mt-4">Modalidad</h5>
-                        <select name="mode" id="" class="form-control">
-                            <option value="G" <?php if(isset($_POST['mode']) and $_POST['mode']=="G"){echo "selected";}?>>Resumido</option>
-                            <option value="D" <?php if(isset($_POST['mode']) and $_POST['mode']=="D"){echo "selected";}?>>Detallado</option>
+                        <select name="mode" id="mode" class="form-control" onchange='myChangeConsulta()'>
+                            <option value="G" <?php if(isset($_REQUEST['mode']) and $_REQUEST['mode']=="G"){echo "selected";}?>>Resumido</option>
+                            <option value="D" <?php if(isset($_REQUEST['mode']) and $_REQUEST['mode']=="D"){echo "selected";}?>>Detallado</option>
                         </select>
                         <h5 class="mt-4">Agrupado Por</h5>
-                        <select name="group" id="" class="form-control">
-                            <option value="state" <?php if(isset($_POST['group']) and $_POST['group']=="state"){echo "selected";}?>>Estado</option>
-                            <option value="task_type" <?php if(isset($_POST['group']) and $_POST['group']=="task_type"){echo "selected";}?>>Tipo</option>
-                            <option value="due_date_date" <?php if(isset($_POST['group']) and $_POST['group']=="due_date_date"){echo "selected";}?>>Día</option>
-                            <option value="due_date_week" <?php if(isset($_POST['group']) and $_POST['group']=="due_date_week"){echo "selected";}?>>Semana</option>
+                        <select name="group" id="group" class="form-control" onchange='myChangeConsulta()'>
+                            <option value="state" <?php if(isset($_REQUEST['group']) and $_REQUEST['group']=="state"){echo "selected";}?>>Estado</option>
+                            <option value="task_type" <?php if(isset($_REQUEST['group']) and $_REQUEST['group']=="task_type"){echo "selected";}?>>Tipo</option>
+                            <option value="due_date_date" <?php if(isset($_REQUEST['group']) and $_REQUEST['group']=="due_date_date"){echo "selected";}?>>Día</option>
+                            <option value="due_date_week" <?php if(isset($_REQUEST['group']) and $_REQUEST['group']=="due_date_week"){echo "selected";}?>>Semana</option>
+                            <option value="due_date_month" <?php if(isset($_REQUEST['group']) and $_REQUEST['group']=="due_date_month"){echo "selected";}?>>Mes</option>
+                            <option value="due_date_year" <?php if(isset($_REQUEST['group']) and $_REQUEST['group']=="due_date_year"){echo "selected";}?>>Año</option>
                         </select>
                         <div class="d-grid gap-2 mt-2">
                             <a href="consulta.php" class="btn btn-danger btn-block">
                                 <i class="bi bi-ban me-1"></i>Borrar Filtros
                             </a>
-                            <button type="submit" class="btn btn-secondary">
+                            <button id="buscar" type="submit" class="btn btn-secondary">
                                 <i class="bi bi-search me-1"></i>Buscar
                             </button>
                         </div>
@@ -47,19 +49,25 @@
                     <div class="card-header bg-primary text-white">
                         <h2 class="text-center">
                             <?php
-                                if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                                    echo "Por Estado";
-                                }else{
-                                    if($_POST['group']=="state"){
+                                
+                                if(isset($_REQUEST['group'])){
+                                    $group = $_REQUEST['group'];
+                                    if($group=="state"){
                                         echo "Por Estado";
-                                    }elseif($_POST['group']=="task_type"){
+                                    }elseif($group=="task_type"){
                                         echo "Por Tipo";
-                                    }elseif($_POST['group']=="due_date_date"){
+                                    }elseif($group=="due_date_date"){
                                         echo "Por Día";
-                                    }elseif($_POST['group']=="due_date_week"){
+                                    }elseif($group=="due_date_week"){
                                         echo "Por Semana";
+                                    }elseif($group=="due_date_month"){
+                                        echo "Por Mes";
+                                    }elseif($group=="due_date_year"){
+                                        echo "Por Año";
                                     }
-                                } 
+                                }else{
+                                    echo "Por Estado";
+                                }
                             ?>
 
                         </h2>
@@ -69,11 +77,10 @@
                             <tbody>
                                 <?php
                                 $tasks = new Tasks();
-                                if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                                    $results = $tasks->consultar_tareas_x_grupo('G','state');
-                                }elseif($_SERVER['REQUEST_METHOD'] === 'POST'){
-                                    $results = $tasks->consultar_tareas_x_grupo($_POST['mode'],$_POST['group']);
-                                } 
+                                $results = $tasks->consultar_tareas_x_grupo(
+                                    (isset($_REQUEST['mode'])?$_REQUEST['mode']:'G'),
+                                    (isset($_REQUEST['group'])?$_REQUEST['group']:'state')
+                                ); 
                                 echo $results;
                                 ?>
                             </tbody>

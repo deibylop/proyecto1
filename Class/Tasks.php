@@ -45,8 +45,8 @@ class Tasks extends ModelsDB
         parent::__construct();
     }
 
-    public function consultar_tareas($state)
-    {
+    //tareas pagina principal
+    public function consultar_tareas($state){
         $instruccion = "CALL sp_get_tasksbystate('".$state."')";
         $consulta = $this->_db->query($instruccion);
         $resultado = $consulta->fetch_all(MYSQLI_ASSOC);
@@ -59,12 +59,21 @@ class Tasks extends ModelsDB
                                     '<td>' .
                                         '<div class="card">' .
                                             '<div class="card-body">' .
-                                                '<h5 class="card-title">' . $row["title"] . '</h5>' .
+                                                '<div class="row">'.
+                                                    '<div class="col-10">'.
+                                                        '<h5 class="card-title">' . $row["title"] . '</h5>' .
+                                                    '</div>'.
+                                                    '<!--div class="col-2">'.
+                                                        '<h5><a href=status_change.php?id='.$row["id"].'><i class="ms-1 bi bi-check-square-fill"></i></a></h5>'.
+                                                    '</div-->'.
+                                                '</div>'.
+                                                
                                                 '<p class="card-text">' . $row["description"] . '</p>' .
                                                 '<p class="card-text">'. 
                                                     'Fecha de Vencimiento: ' . date('j/n/Y', strtotime($row['due_date'])) . '<br>' . 
-                                                    'Tipo: '.$row["icon"].' '.$row["tipo"].'  -  '.
-                                                    '<a href=editar.php?id='.$row["id"].'><i class="bi bi-pencil"></i> Editar</a>'.
+                                                    ($row["edited"]=="1"?'<span style="color:red" data-toggle="tooltip" data-placement="top" title="Editado"><i class="bi bi-pencil me-2" ></i></span>':'').
+                                                    $row["icon"].' '.$row["tipo"]. ' '.
+                                                    '<a href=editar.php?id='.$row["id"].'><i class="bi bi-pencil-square"></i> Editar</a>'.
                                                 '</p>' . 
                                                 
                                             '</div>' .
@@ -78,10 +87,8 @@ class Tasks extends ModelsDB
         }
     }
 
-
-    public function guardar_tarea()
-    {
-
+    //crud insert
+    public function guardar_tarea(){
         //Datos
         $title = $this->title;
         $description = $this->description;
@@ -90,7 +97,6 @@ class Tasks extends ModelsDB
         $due_date = $this->due_date;
         $edited = $this->edited ? $this->edited : '0';
         $task_type = $this->task_type;
-
         $instruccion = "CALL sp_insert_tasks(
             '$title',
             '$description',
@@ -100,7 +106,6 @@ class Tasks extends ModelsDB
             '$responsible',
             '$task_type'
         )";
-
         if ($this->_db->query($instruccion) === TRUE) {
             //echo "La consulta se ejecutó con éxito.";
         } else {
@@ -108,6 +113,7 @@ class Tasks extends ModelsDB
         }
     }
 
+    //tareas desde pagina de consulta(repoorte) 
     public function consultar_tareas_x_grupo($mode,$group){
         $instruccion = "CALL sp_get_tasksbygroup('".$mode."','".$group."')";
         $consulta = $this->_db->query($instruccion);
@@ -126,12 +132,22 @@ class Tasks extends ModelsDB
                     $encabezado = "Día";
                 }elseif($group=="due_date_week"){
                     $encabezado = "Semana";
+                }elseif($group=="due_date_month"){
+                    $encabezado = "Mes";
+                }elseif($group=="due_date_year"){
+                    $encabezado = "Año";
                 }
                 $html = "<tr><th>".$encabezado."</th><th>Titulo</th><th>Estado</th><th>Fecha</th><th>Tipo</th></tr>";
                 foreach ($resultado as $row) {
+                    if($row["group_total"]=='0'){
+                        $colgroup = '';
+                    }else{
+                        
+                        $colgroup = '<td rowspan="'.$row["group_total"].'" ><b>' . $row["group_column"] . '</b></td>';
+                    }
                     $html = $html . '<tr>' .
-                                        '<td><b>' . $row["group_column"] . '</b></td>'.
-                                        '<td><a href=editar.php?id='.$row["id"].'><i class="bi bi-pencil"></i></a>  ' . $row["title"] . '</td>' .
+                                        $colgroup.
+                                        '<td><a href=editar.php?id='.$row["id"].'&mode='.$mode.'&group='.$group.'><i class="bi bi-pencil"></i></a>  ' . $row["title"] . '</td>' .
                                         '<td>' . $row["state"] . '</td>'.
                                         '<td>' . $row["due_date"] . '</td>' .
                                         '<td>' . $row["tipo"]. '</td>'.
@@ -154,9 +170,8 @@ class Tasks extends ModelsDB
         }
     }  
 
-    
-    public function lista_tipos()
-    {
+    //lista de valores tipos
+    public function lista_tipos(){
         $instruccion = 'CALL sp_get_tasktype()';
         $consulta = $this->_db->query($instruccion);
         $resultado = $consulta->fetch_all(MYSQLI_ASSOC);
@@ -173,8 +188,8 @@ class Tasks extends ModelsDB
         }
     }
 
-    public function consultar_tareasporid($id)
-    {
+    //detalle de una tarea
+    public function consultar_tareasporid($id){
         $instruccion = "CALL sp_get_tasksbyid('".$id."')";
         $consulta = $this->_db->query($instruccion);
         $resultado = $consulta->fetch_all(MYSQLI_ASSOC);
@@ -188,16 +203,15 @@ class Tasks extends ModelsDB
         }
     }
 
-    public function actualizar_tarea($id)
-    {
-
+    //crud update
+    public function actualizar_tarea($id) {
         //Datos
         $title = $this->title;
         $description = $this->description;
         $responsible = $this->responsible;
         $state = $this->state ? $this->state : 'por hacer';
         $due_date = $this->due_date;
-        $edited = $this->edited ? $this->edited : '0';
+        $edited = $this->edited ? $this->edited : '1';
         $task_type = $this->task_type;
 
         $instruccion = "CALL sp_update_task(
@@ -211,6 +225,17 @@ class Tasks extends ModelsDB
             '$task_type'
         )";
 
+        if ($this->_db->query($instruccion) === TRUE) {
+            //echo "La consulta se ejecutó con éxito.";
+        } else {
+            echo "Error al ejecutar la consulta: " . $this->_db->error;
+        }
+    }
+
+    //crud delete
+    public function eliminar_tarea($id){
+
+        $instruccion = "CALL sp_delete_task('".$id."')";
         if ($this->_db->query($instruccion) === TRUE) {
             //echo "La consulta se ejecutó con éxito.";
         } else {
