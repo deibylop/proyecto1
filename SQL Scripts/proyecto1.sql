@@ -25,9 +25,12 @@ CREATE TABLE `tasks` (
   `due_date` datetime NOT NULL,
   `edited` tinyint(1) NOT NULL DEFAULT '0',
   `responsible` varchar(100) NOT NULL,
-  `task_type` varchar(20) NOT NULL,
-  PRIMARY KEY (`id`)
+  `task_type` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT fk_type FOREIGN KEY (task_type) REFERENCES task_type(id)  
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+
+
 
 INSERT INTO `tasks` (`id`, `title`, `description`, `state`, `due_date`, `edited`, `responsible`, `task_type`) VALUES
 (2, 'Comprar leche', 'Comprar leche en el supermercado', 'por hacer', '2023-10-10 10:00:00', 0, 'Juan Pérez', 'Compras'),
@@ -135,6 +138,16 @@ BEGIN
   on t.task_type = tt.id
   where t.state like pstate;
 END;
+
+
+--ALTER TABLE tasks ADD FOREIGN KEY (task_type) REFERENCES task_type(id);
+
+CREATE TABLE `task_type` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(120) NOT NULL,
+  `icon` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`) 
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
 insert into task_type(title,icon)values('Personal','<i class="bi bi-person-badge-fill"></i>');
 insert into task_type(title,icon)values('Trabajo','<i class="bi bi-briefcase-fill"></i>');

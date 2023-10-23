@@ -79,6 +79,7 @@ include('./Class/Tasks.php');
                         </li>
                         <li class="list-group-item">
                             <select name="state" class="form-control" aria-label="Estado" required>
+                                <option value="" disabled>Estado...</option>
                                 <option value="por hacer" <?php if(isset($state) and $state=="por hacer"){echo "selected";}?>>Por Hacer</option>
                                 <option value="en progreso" <?php if(isset($state) and $state=="en progreso"){echo "selected";}?>>En Progreso</option>
                                 <option value="completada" <?php if(isset($state) and $state=="completada"){echo "selected";}?>>Completada</option>
