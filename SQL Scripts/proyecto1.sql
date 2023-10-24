@@ -33,9 +33,9 @@ CREATE TABLE `tasks` (
 
 
 INSERT INTO `tasks` (`id`, `title`, `description`, `state`, `due_date`, `edited`, `responsible`, `task_type`) VALUES
-(2, 'Comprar leche', 'Comprar leche en el supermercado', 'por hacer', '2023-10-10 10:00:00', 0, 'Juan Pérez', 'Compras'),
-(4, 'Comprar leche', 'Comprar leche en el supermercado', 'por hacer', '2023-10-10 10:00:00', 0, 'Juan Pérez', 'Compras'),
-(5, 'Llamar al doctor', 'Llamar al doctor para programar una cita', 'por hacer', '2023-10-11 12:00:00', 0, 'María López', 'Salud');
+(2, 'Comprar leche', 'Comprar leche en el supermercado', 'por hacer', '2023-10-10 10:00:00', 0, 'Juan Pérez', (select id from task_type where title like 'Compras')),
+(4, 'Comprar leche', 'Comprar leche en el supermercado', 'por hacer', '2023-10-10 10:00:00', 0, 'Juan Pérez', (select id from task_type where title like 'Compras')),
+(5, 'Llamar al doctor', 'Llamar al doctor para programar una cita', 'por hacer', '2023-10-11 12:00:00', 0, 'María López', (select id from task_type where title like 'Salud'));
 
 DELIMITER //
 
