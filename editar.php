@@ -31,7 +31,7 @@ include('./Class/Tasks.php');
                     $title = $row['title'];
                     $description = $row['description'];
                     $responsible = $row['responsible'];
-                    $due_date = date('Y-n-j', strtotime($row['due_date']));
+                    $due_date = $row['due_date'];
                     $task_type = $row['task_type'];
                     $state = $row['state'];
                 }
@@ -63,7 +63,7 @@ include('./Class/Tasks.php');
                                 aria-label="Responsable" value="<?php if(isset($responsible)){echo $responsible;} ?>" required>
                         </li>
                         <li class="list-group-item">
-                            <input name="due_date" type="date" class="form-control" placeholder="Fecha" aria-label="Fecha" value="<?php if(isset($due_date)){echo $due_date;} ?>" required>
+                            <input name="due_date" type="datetime-local" class="form-control" placeholder="Fecha" aria-label="Fecha" value="<?php if(isset($due_date)){echo $due_date;} ?>" required>
                         </li>
                         <li class="list-group-item">
                             <select name="task_type" class="form-control" aria-label="Tipo" required>

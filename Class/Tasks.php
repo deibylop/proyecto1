@@ -54,7 +54,7 @@ class Tasks extends ModelsDB
         if (!$resultado) {
             return "<tr><td> No hay datos para mostrar</td></tr>";
         } else {
-            foreach ($resultado as $row) {
+            foreach ($resultado as $row) {//date('j/n/Y', strtotime($row['due_date'])) 
                 $html = $html . '<tr>' .
                                     '<td>' .
                                         '<div class="card">' .
@@ -70,7 +70,7 @@ class Tasks extends ModelsDB
                                                 
                                                 '<p class="card-text">' . $row["description"] . '</p>' .
                                                 '<p class="card-text">'. 
-                                                    'Fecha de Vencimiento: ' . date('j/n/Y', strtotime($row['due_date'])) . '<br>' . 
+                                                    'Vencimiento: ' . date('j/n/Y g:i a', strtotime($row['due_date']))  . '<br>' . 
                                                     ($row["edited"]=="1"?'<span style="color:red" data-toggle="tooltip" data-placement="top" title="Editado"><i class="bi bi-pencil me-2" ></i></span>':'').
                                                     $row["icon"].' '.$row["tipo"]. ' '.
                                                     '<a href=editar.php?id='.$row["id"].'><i class="bi bi-pencil-square"></i> Editar</a>'.
@@ -149,7 +149,7 @@ class Tasks extends ModelsDB
                                         $colgroup.
                                         '<td><a href=editar.php?id='.$row["id"].'&mode='.$mode.'&group='.$group.'><i class="bi bi-pencil"></i></a>  ' . $row["title"] . '</td>' .
                                         '<td>' . $row["state"] . '</td>'.
-                                        '<td>' . $row["due_date"] . '</td>' .
+                                        '<td>' . date('j/n/Y g:i a', strtotime($row['due_date'])) . '</td>' .
                                         '<td>' . $row["tipo"]. '</td>'.
                                     '</tr>';
                 }

@@ -39,7 +39,7 @@ include('./Class/Tasks.php');
                                 aria-label="Responsable" required>
                         </li>
                         <li class="list-group-item">
-                            <input name="due_date" type="date" class="form-control" placeholder="Fecha" aria-label="Fecha" required>
+                            <input name="due_date" type="datetime-local" class="form-control" placeholder="Fecha" aria-label="Fecha" required>
                         </li>
                         <li class="list-group-item">
                             <select name="task_type" class="form-control" aria-label="Tipo" required>

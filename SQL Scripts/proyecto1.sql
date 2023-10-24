@@ -204,7 +204,7 @@ BEGIN
       t.id,
       t.title,
       t.state,
-      DATE_FORMAT(t.due_date, '%d-%m-%Y')due_date,
+      t.due_date,
       tt.title tipo
     FROM tasks t
     LEFT JOIN task_type tt
@@ -218,7 +218,7 @@ BEGIN
       t.id,
       t.title,
       t.state,
-      DATE_FORMAT(t.due_date, '%d-%m-%Y')due_date,
+      t.due_date,
       tt.title tipo
     FROM tasks t
     INNER JOIN task_type tt
@@ -232,7 +232,7 @@ BEGIN
       t.id,
       t.title,
       t.state,
-      DATE_FORMAT(t.due_date, '%d-%m-%Y')due_date,
+      t.due_date,
       tt.title tipo
     FROM tasks t
     LEFT JOIN task_type tt
@@ -246,7 +246,7 @@ BEGIN
       t.id,
       t.title,
       t.state,
-      DATE_FORMAT(t.due_date, '%d-%m-%Y')due_date,
+      t.due_date,
       tt.title tipo
     FROM tasks t
     LEFT JOIN task_type tt
@@ -260,7 +260,7 @@ BEGIN
       t.id,
       t.title,
       t.state,
-      DATE_FORMAT(t.due_date, '%d-%m-%Y')due_date,
+      t.due_date,
       tt.title tipo
     FROM tasks t
     LEFT JOIN task_type tt
@@ -274,7 +274,7 @@ BEGIN
       t.id,
       t.title,
       t.state,
-      DATE_FORMAT(t.due_date, '%d-%m-%Y')due_date,
+      t.due_date,
       tt.title tipo
     FROM tasks t
     LEFT JOIN task_type tt
