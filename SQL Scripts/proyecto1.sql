@@ -191,6 +191,7 @@ BEGIN
 END;
 //
 
+DROP PROCEDURE IF EXISTS `sp_get_tasksbygroup`;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_tasksbygroup`(
   IN mode  VARCHAR(1),
   IN pgroup VARCHAR(15)
@@ -242,7 +243,7 @@ BEGIN
     SELECT
       DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY)group_order,
       DATE_FORMAT(DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY), '%d-%m-%Y')  group_column,
-      case when (dense_rank() over (partition by DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY) order by DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY),t.due_date,t.id)) = 1 then COUNT(DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY)) OVER (PARTITION BY DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY)) else 0 end  as group_total,
+      case when (dense_rank() over (partition by DATE_FORMAT(DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY), '%d-%m-%Y') order by DATE_FORMAT(DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY), '%d-%m-%Y'),t.due_date,t.id)) = 1 then COUNT(DATE_FORMAT(DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY), '%d-%m-%Y')) OVER (PARTITION BY DATE_FORMAT(DATE_ADD(t.due_date, INTERVAL(-WEEKDAY(t.due_date)) DAY), '%d-%m-%Y')) else 0 end  as group_total,
       t.id,
       t.title,
       t.state,
