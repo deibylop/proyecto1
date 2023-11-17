@@ -1,6 +1,6 @@
 <?php 
     include('./includes/header.php');
-    include('./Class/Tasks.php');
+    include('./Class/ServiceApi.php');
 ?>
 <div class="container-full">
     
@@ -35,8 +35,16 @@
                         <table class="table">
                             <tbody>
                                 <?php
-                                $tasks = new Tasks();
-                                $results = $tasks->consultar_tareas("por hacer");
+                                $data = '{
+                                    "procedure_id": 1,
+                                    "params": 
+                                      {
+                                        "estado": "por hacer"
+                                      }
+                                  }';
+                                  
+                                $serviceCall = new ServiceApi();
+                                $results = $serviceCall->sendData($data);
                                 echo $results;
                                 ?>
                             </tbody>
@@ -53,8 +61,15 @@
                         <table class="table">
                             <tbody>
                             <?php
-                                $tasks = new Tasks();
-                                $results = $tasks->consultar_tareas("en progreso");
+                                $data = '{
+                                    "procedure_id": 1,
+                                    "params": 
+                                      {
+                                        "estado": "en progreso"
+                                      }
+                                  }';                            
+                                $postData = new ServiceApi();
+                                $results = $postData->sendData($data);
                                 echo $results;
                                 ?>
                             </tbody>
@@ -71,8 +86,15 @@
                         <table class="table">
                             <tbody>
                                 <?php
-                                    $tasks = new Tasks();
-                                    $results = $tasks->consultar_tareas("completada");
+                                $data = '{
+                                    "procedure_id": 1,
+                                    "params": 
+                                      {
+                                        "estado": "completada"
+                                      }
+                                  }';                                
+                                    $postData = new ServiceApi();
+                                    $results = $postData->sendData($data);
                                     echo $results;
                                 ?>
                             </tbody>
