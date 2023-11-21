@@ -1,7 +1,9 @@
 <?php
 
-//ARCHIVO PARA CENTRALIZAR TODAS LAS PETICIONES API EN UN SOLO LUGAR
-//VALIDAR DATOS DE USUARIO Y PASS DE LA CONEXION DB
+/*
+ARCHIVO PARA CENTRALIZAR TODAS LAS PETICIONES API EN UN SOLO LUGAR
+VALIDAR DATOS DE USUARIO Y PASS DE LA CONEXION DB
+*/
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
@@ -29,20 +31,85 @@ function callStoredProcedure($procedureId, $params)
 {
     $conex = new Conexion();
     $db = $conex->obtenerConexion();
+    $tasks = new Tasks($db);
 
     switch($procedureId)
     {
         case 1:
             try{
-                $tasks = new Tasks($db);
                 $results = $tasks->consultar_tareas($params['estado']);
-                
-                if ($results) 
-                    return $results;
+                return $results;
             }
-            catch(Exception $error){
+            catch(ErrorException $error){
                 onErroCallService($error);
             }
+            break;
+
+        case 2:
+                try{
+                    $tasks->setTitle($params['title']);
+                    $tasks->setDescription($params['description']);
+                    $tasks->setResponsible($params['responsible']);
+                    $tasks->setDueDate($params['due_date']);
+                    $tasks->setTaskType($params['task_type']);
+                    $results = $tasks->guardar_tarea();
+                    return $results;
+                }
+                catch(ErrorException $error){
+                    onErroCallService($error);
+                }
+                break;
+
+        case 3:
+                try{
+                        $results = $tasks->lista_tipos();
+                        return $results;
+                    }
+                catch(ErrorException $error){
+                        echo json_encode(array('error' => $error));       
+                        onErroCallService($error);
+                    }
+                break;
+                
+            case 4:
+                    try{
+                            $results = $tasks->eliminar_tarea($params['id']);
+                            return $results;
+                        }
+                    catch(ErrorException $error){
+                            echo json_encode(array('error' => $error));       
+                            onErroCallService($error);
+                        }
+                    break; 
+
+                case 5:
+                        try{
+                                $tasks->setTitle($params['title']);
+                                $tasks->setDescription($params['description']);
+                                $tasks->setResponsible($params['responsible']);
+                                $tasks->setDueDate($params['due_date']);
+                                $tasks->setTaskType($params['task_type']);
+                                $tasks->setState($params['state']);                
+                                $results = $tasks->actualizar_tarea($params['id']);
+                                return $results;
+                            }
+                        catch(ErrorException $error){
+                                echo json_encode(array('error' => $error));       
+                                onErroCallService($error);
+                            }
+                    break; 
+
+                    case 6:
+                        try{              
+                                $results = $tasks->consultar_tareasporid($params['id']);
+                                return $results;
+                            }
+                        catch(ErrorException $error){
+                                echo json_encode(array('error' => $error));       
+                                onErroCallService($error);
+                            }
+                    break;  
+
     }}
 
 
