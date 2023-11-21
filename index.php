@@ -1,6 +1,10 @@
 <?php 
     include('./includes/header.php');
     include('./Class/ServiceApi.php');
+$dataPorHacer = '{ "procedure_id": 1, "params": {"estado": "por hacer"} }';
+$dataEnProgreso = '{ "procedure_id": 1, "params": { "estado": "en progreso" } }';
+$dataCompletada = '{ "procedure_id": 1, "params": { "estado": "completada" } }';  
+
 ?>
 <div class="container-full">
     
@@ -35,16 +39,8 @@
                         <table class="table">
                             <tbody>
                                 <?php
-                                $data = '{
-                                    "procedure_id": 1,
-                                    "params": 
-                                      {
-                                        "estado": "por hacer"
-                                      }
-                                  }';
-                                  
                                 $serviceCall = new ServiceApi();
-                                $results = $serviceCall->sendData($data);
+                                $results = $serviceCall->sendData($dataPorHacer);
                                 echo $results;
                                 ?>
                             </tbody>
@@ -60,16 +56,9 @@
                     <div class="card-body" style="max-height: 450px; overflow-y: scroll;">
                         <table class="table">
                             <tbody>
-                            <?php
-                                $data = '{
-                                    "procedure_id": 1,
-                                    "params": 
-                                      {
-                                        "estado": "en progreso"
-                                      }
-                                  }';                            
+                            <?php                         
                                 $postData = new ServiceApi();
-                                $results = $postData->sendData($data);
+                                $results = $postData->sendData($dataEnProgreso);
                                 echo $results;
                                 ?>
                             </tbody>
@@ -85,16 +74,9 @@
                     <div class="card-body" style="max-height: 450px; overflow-y: scroll;">
                         <table class="table">
                             <tbody>
-                                <?php
-                                $data = '{
-                                    "procedure_id": 1,
-                                    "params": 
-                                      {
-                                        "estado": "completada"
-                                      }
-                                  }';                                
+                                <?php                              
                                     $postData = new ServiceApi();
-                                    $results = $postData->sendData($data);
+                                    $results = $postData->sendData($dataCompletada);
                                     echo $results;
                                 ?>
                             </tbody>
