@@ -110,7 +110,7 @@ class Tasks
             '$task_type'
         )";
         if ($this->_db->query($instruccion) === TRUE) {
-            //echo "La consulta se ejecutó con éxito.";
+            return true;
         } else {
             echo "Error al ejecutar la consulta: " . $this->_db->error;
         }
@@ -240,9 +240,10 @@ class Tasks
 
         $instruccion = "CALL sp_delete_task('".$id."')";
         if ($this->_db->query($instruccion) === TRUE) {
-            //echo "La consulta se ejecutó con éxito.";
+            return true;
         } else {
             echo "Error al ejecutar la consulta: " . $this->_db->error;
+            return false;
         }
     }
 }
