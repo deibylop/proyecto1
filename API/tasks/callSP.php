@@ -102,7 +102,8 @@ function callStoredProcedure($procedureId, $params)
                     case 6:
                         try{              
                                 $results = $tasks->consultar_tareasporid($params['id']);
-                                return $results;
+                                return json_encode($results);
+                                
                             }
                         catch(ErrorException $error){
                                 echo json_encode(array('error' => $error));       
@@ -110,6 +111,17 @@ function callStoredProcedure($procedureId, $params)
                             }
                     break;  
 
+                    case 7:
+                        try{              
+                                $results = $tasks->consultar_tareas_x_grupo($params['mode'],$params['group']);
+                                return $results;
+                                
+                            }
+                        catch(ErrorException $error){
+                                echo json_encode(array('error' => $error));       
+                                onErroCallService($error);
+                            }
+                    break;  
     }}
 
 

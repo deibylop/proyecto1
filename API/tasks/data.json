@@ -5,3 +5,26 @@
       "estado": "por hacer"
     }
 }
+
+{
+  "procedure_id": 2,
+  "params": 
+    {
+    "title":"SAMPLE JSON",
+    "description":"NUEVO JSON DESDE POST MAN",
+    "responsible":" POSTMAN",
+    "due_date":":2023-11-09T14:49",
+    "task_type":"1"
+  }
+}
+
+
+{
+  "procedure_id": 3,
+  "params": 
+    {}
+}
+
+
+string(56) "{ "procedure_id": 1, "params": {"estado": "por hacer"} }"
+"{ "procedure_id": 6, "params": { "id":5",}}"

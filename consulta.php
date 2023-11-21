@@ -1,6 +1,6 @@
 <?php 
     include('./includes/header.php');
-    include('./Class/Tasks.php');
+    include('./Class/ServiceApi.php');
 ?>
 <div class="container-full" id="consulta">
     
@@ -76,11 +76,15 @@
                         <table class="table">
                             <tbody>
                                 <?php
-                                $tasks = new Tasks();
-                                $results = $tasks->consultar_tareas_x_grupo(
-                                    (isset($_REQUEST['mode'])?$_REQUEST['mode']:'G'),
-                                    (isset($_REQUEST['group'])?$_REQUEST['group']:'state')
-                                ); 
+                                $consultar_tareas_x_grupo = '{
+                                    "procedure_id": 7,
+                                    "params":{
+                                        "mode":"'.(isset($_REQUEST['mode'])?$_REQUEST['mode']:'G').'",
+                                        "group":"'.(isset($_REQUEST['group'])?$_REQUEST['group']:'state').'"
+                                    }
+                                }';
+                                $serviceCall = new ServiceApi();
+                                $results = $serviceCall->sendData($consultar_tareas_x_grupo);
                                 echo $results;
                                 ?>
                             </tbody>

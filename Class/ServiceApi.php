@@ -2,6 +2,7 @@
 
 class ServiceApi
 {
+    //VALIDAR URL AL ACTUALIZAR REPO
     protected $url = 'http://localhost:8888/Proyecto1/api/tasks/callSP.php';
 
     public function __construct()

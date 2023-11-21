@@ -1,6 +1,6 @@
 <?php
 include('./includes/header.php');
-include('./Class/Tasks.php');
+include('./Class/ServiceApi.php');
 ?>
 <br><br>
 <div class="container" style="max-width: max-content;">
@@ -9,14 +9,21 @@ include('./Class/Tasks.php');
 
             <?php
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {                
-                $task = new Tasks();
-                $task->setTitle($_POST['title']);
-                $task->setDescription($_POST['description']);
-                $task->setResponsible($_POST['responsible']);
-                $task->setDueDate($_POST['due_date']);
-                $task->setTaskType($_POST['task_type']);
-                $task->setState($_POST['state']);
-                $task->actualizar_tarea($_POST['id']);
+                $dataActualizarTarea = '{
+                    "procedure_id": 5,
+                    "params": 
+                      {
+                      "title":"'.$_POST['title'].'",
+                      "description":"'.$_POST['description'].'",
+                      "responsible":"'.$_POST['responsible'].'",
+                      "due_date":"'.$_POST['due_date'].'",
+                      "task_type":"'.$_POST['task_type'].'",
+                      "state":"'.$_POST['state'].'",
+                      "id":"'.$_POST['id'].'"
+                    }
+                  }';
+                $serviceCall = new ServiceApi();
+                $results = $serviceCall->sendData($dataActualizarTarea);
                 if(isset($_POST['mode'])){
                     header('Location: consulta.php?mode='.$_POST['mode'].'&group='.$_POST['group']); die();
                 }else{
@@ -25,9 +32,17 @@ include('./Class/Tasks.php');
             ?>
                 <?php
             } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $tasks = new Tasks();
-                $results = $tasks->consultar_tareasporid($_GET['id']);
-                foreach ($results as $row) {
+                $dataConsultaPorId = '{
+                    "procedure_id": 6,
+                    "params": 
+                      {
+                      "id":'.$_GET['id'].'
+                    }
+                  }';
+                $serviceCall = new ServiceApi();
+                $results = $serviceCall->sendData($dataConsultaPorId);
+                $result = json_decode($results,true);
+                foreach ($result as $row) {
                     $title = $row['title'];
                     $description = $row['description'];
                     $responsible = $row['responsible'];
@@ -68,12 +83,16 @@ include('./Class/Tasks.php');
                         <li class="list-group-item">
                             <select name="task_type" class="form-control" aria-label="Tipo" required>
                                 <?php
-                                $tasks = new Tasks();
-                                $options = $tasks->lista_tipos();
-                                if($options){
-                                    $options = str_replace('value="'.$task_type.'"','value="'.$task_type.'" selected ',$options);
+                                $listar_tipos = '{
+                                    "procedure_id": 3,
+                                    "params":{}
+                                }';
+                                $serviceCall = new ServiceApi();
+                                $results = $serviceCall->sendData($listar_tipos);                                
+                                if($results){
+                                    $results = str_replace('value="'.$task_type.'"','value="'.$task_type.'" selected ',$results);
                                 }
-                                echo $options;
+                                echo $results;
                                 ?>
                             </select>
                         </li>

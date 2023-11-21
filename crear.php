@@ -1,6 +1,7 @@
 <?php
 include('./includes/header.php');
-include('./Class/Tasks.php');
+include('./Class/ServiceApi.php');
+
 ?>
 <br><br>
 <div class="container" style="max-width: max-content;">
@@ -9,16 +10,21 @@ include('./Class/Tasks.php');
 
             <?php
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $task = new Tasks();
-                $task->setTitle($_POST['title']);
-                $task->setDescription($_POST['description']);
-                $task->setResponsible($_POST['responsible']);
-                $task->setDueDate($_POST['due_date']);
-                $task->setTaskType($_POST['task_type']);
-                $task->guardar_tarea();
+                $dataCrearTarea = '{
+                      "procedure_id": 2,
+                      "params": 
+                        {
+                        "title":"'.$_POST['title'].'",
+                        "description":"'.$_POST['description'].'",
+                        "responsible":"'.$_POST['responsible'].'",
+                        "due_date":"'.$_POST['due_date'].'",
+                        "task_type":"'.$_POST['task_type'].'"
+                    }
+                  }';
+                $serviceCall = new ServiceApi();
+                $results = $serviceCall->sendData($dataCrearTarea);
+                echo $results;
                 header('Location: index.php'); die();
-                ?>
-                <?php
             } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 ?>
                 <form action="crear.php" method="post" class="was-validated" >
@@ -43,11 +49,15 @@ include('./Class/Tasks.php');
                         </li>
                         <li class="list-group-item">
                             <select name="task_type" class="form-control" aria-label="Tipo" required>
-                                <?php
-                                $tasks = new Tasks();
-                                $options = $tasks->lista_tipos();
-                                echo $options;
-                                ?>
+                            <?php
+                                $listar_tipos = '{
+                                    "procedure_id": 3,
+                                    "params":{}
+                                }';
+                                $serviceCall = new ServiceApi();
+                                $results = $serviceCall->sendData($listar_tipos);
+                                echo $results;
+                             ?>
                             </select>
                         </li>
                     </ul>
